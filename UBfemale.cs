@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using IllusionUtility.GetUtility;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -117,10 +122,7 @@ namespace UncensorBody
                 {
                     if( transform.name == newCollider.name.Substring(5))
                     {
-                        newCollider.transform.SetParent(transform, false);
-                        
-                        newCollider.GetComponent<MeshFilter>().sharedMesh = newCollider.GetComponent<MeshCollider>().sharedMesh;
-                        newCollider.GetComponent<MeshRenderer>().enabled = false;
+                        newCollider.transform.SetParent(transform, false);              
                         break;
                     }
                 }
@@ -146,20 +148,6 @@ namespace UncensorBody
             }
         }
         
-        public void DisplayCollider()
-        {
-            DisplayBodyCollider = !DisplayBodyCollider;
-            foreach (GameObject orgCollider in OrgBodyColliders)
-            {
-                orgCollider.GetComponent<MeshRenderer>().enabled = DisplayBodyCollider;
-            }
-
-            foreach (GameObject newCollider in NewBodyColliders)
-            {
-                newCollider.GetComponent<MeshRenderer>().enabled = DisplayBodyCollider;
-            }
-        }
-
         internal void SetMainBodyMaterials()
         {
             if(UpperBodyMain != null && LowerBodyPlain != null && LowerBodyVagina != null)
@@ -218,7 +206,7 @@ namespace UncensorBody
             GameObject TopMesh = Transform_Utility.FindTransform(TopRoot.transform, name).gameObject;
             if (TopMesh != null)
             {
-                return Transform_Utility.FindTransform_Partial(TopMesh.transform, "body").GetComponent<SkinnedMeshRenderer>();
+                return Transform_Utility.FindTransform_Partial(TopMesh.transform, "body").GetComponentInChildren<SkinnedMeshRenderer>();
             }
             return null;
         }
@@ -252,6 +240,8 @@ namespace UncensorBody
 
         private void Update()
         {
+            if (UncensorBody._sNewFemaleBodyCollider.Value != !UseOrgBodyCollider) ChangeBodyCollider();
+
             if (WaitTin) VaginaOpen = InsertMale.TinEnable;
 
             if (VaginaItem) if (InsertItem_V == null) VaginaItem = false;

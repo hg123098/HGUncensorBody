@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using H;
 using Character;
 using HarmonyLib;
@@ -13,9 +14,9 @@ namespace UncensorBody
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_Version)]
     public class UncensorBody : BaseUnityPlugin
     {
-        public const string PLUGIN_NAME = "Automatic Uncensor Body";
+        public const string PLUGIN_NAME = "HG UncensorBody";
         public const string PLUGIN_GUID = "HG.UncensorBody";
-        public const string PLUGIN_Version = "1.0.0";
+        public const string PLUGIN_Version = "1.0.1";
 
         internal static string abDataPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/BepInEx/plugins/HG";
         internal static string abName = "HGUncensorBody";
@@ -27,10 +28,16 @@ namespace UncensorBody
         internal static string Anal_IK_Name = "Anal_IK";
         internal static string Oral_IK_Name = "Oral_IK";
 
+        internal static ConfigEntry<bool> _sNewFemaleBodyCollider;
+        internal static ConfigEntry<bool> _sMovePenisPosition;
 
         private void Awake()
         {
-            Harmony.CreateAndPatchAll(typeof(Hooks));
+            _sNewFemaleBodyCollider = Config.Bind("Colliders", "Use precise female body colliders", true, "This option is quite expensive. Turn this option off if you are experiencing severe frame drop issues.");
+            _sMovePenisPosition = Config.Bind("Animations", "Move male penis position for proper insertion animation", true, "Turn this option off if you want to keep vanilla position of male penis");
+
+            var harmony = new Harmony("com.HG.UncensorBody");
+            harmony.PatchAll(typeof(Hooks));
         }
 
         private class Hooks
@@ -190,7 +197,7 @@ namespace UncensorBody
             [HarmonyPrefix, HarmonyPatch(typeof(H_Members), nameof(H_Members.LateUpdate))]
             private static void PreFBIKUpdate()
             {
-                foreach (UBMale UBmale in UBmales) if (UBmale.insertingVagina || UBmale.pettingVagina || UBmale.pettingAna) UBmale.PostAdjust();
+                foreach (UBMale UBmale in UBmales) if ((UBmale.insertingVagina && UncensorBody._sMovePenisPosition.Value) || UBmale.pettingVagina || UBmale.pettingAna) UBmale.PostAdjust();
                 foreach (UBFemale UBfemale in UBfemales) if (UBfemale.VaginaItem || UBfemale.AnalItem) UBfemale.PostAdjust();
             }
 
