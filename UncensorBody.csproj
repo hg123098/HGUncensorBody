@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <AssemblyName>HGUncensorBody</AssemblyName>
+    <AssemblyName>UncensorBody</AssemblyName>
     <Description>Illusion Playhome HG UncensorBody</Description>
     <Version>1.0.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -14,9 +14,9 @@ namespace UncensorBody
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_Version)]
     public class UncensorBody : BaseUnityPlugin
     {
-        public const string PLUGIN_NAME = "HG UncensorBody";
+        public const string PLUGIN_NAME = "HG Uncensor Body";
         public const string PLUGIN_GUID = "HG.UncensorBody";
-        public const string PLUGIN_Version = "1.0.1";
+        public const string PLUGIN_Version = "1.0.2";
 
         internal static string abDataPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/BepInEx/plugins/HG";
         internal static string abName = "HGUncensorBody";
@@ -30,14 +30,33 @@ namespace UncensorBody
 
         internal static ConfigEntry<bool> _sNewFemaleBodyCollider;
         internal static ConfigEntry<bool> _sMovePenisPosition;
+        internal static ConfigEntry<KeyboardShortcut> _sCacheNow;
 
         private void Awake()
         {
             _sNewFemaleBodyCollider = Config.Bind("Colliders", "Use precise female body colliders", true, "This option is quite expensive. Turn this option off if you are experiencing severe frame drop issues.");
             _sMovePenisPosition = Config.Bind("Animations", "Move male penis position for proper insertion animation", true, "Turn this option off if you want to keep vanilla position of male penis");
+            _sCacheNow = Config.Bind("Keyboard shortcuts", "Make mesh cache now", new KeyboardShortcut(KeyCode.H, KeyCode.LeftShift), "Make female top clothes upperbody mesh cache immediately");
 
             var harmony = new Harmony("com.HG.UncensorBody");
             harmony.PatchAll(typeof(Hooks));
+        }
+
+        private void Update()
+        {
+            if(_sCacheNow.Value.IsDown())
+            {
+                bool state = UBFemale.PauseCaching;
+                UBFemale.PauseCaching = false;
+
+                Hooks.CleanUBfemales();
+                foreach (UBFemale UBfemale in UBfemales)
+                {
+                    if (UBfemale.UseOrgTopBody) UBfemale.SetTopBody();
+                }
+
+                UBFemale.PauseCaching = state;
+            }
         }
 
         private class Hooks
@@ -58,7 +77,7 @@ namespace UncensorBody
                 UBmales.Add(UBmale);
             }
 
-            private static void CleanUBfemales()
+            internal static void CleanUBfemales()
             {
                 var toRemove = new List<UBFemale>();
                 foreach (UBFemale UBfemale in UBfemales)
@@ -71,7 +90,7 @@ namespace UncensorBody
                 UBfemales.RemoveAll(script => toRemove.Contains(script));
             }
 
-            private static void CleanUBmales()
+            internal static void CleanUBmales()
             {
                 var toRemove = new List<UBMale>();
                 foreach (UBMale UBmale in UBmales)

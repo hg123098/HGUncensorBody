@@ -122,7 +122,7 @@ namespace UncensorBody
                 {
                     if( transform.name == newCollider.name.Substring(5))
                     {
-                        newCollider.transform.SetParent(transform, false);              
+                        newCollider.transform.SetParent(transform, false);  
                         break;
                     }
                 }
@@ -164,8 +164,13 @@ namespace UncensorBody
 
         public void SetTopBody()
         {
+            UseOrgTopBody = true;
+
             WearData TopWearData = female.wears.GetWearData(Character.WEAR_TYPE.TOP);
-            GameObject TopRoot = female.wears.GetWearObj(Character.WEAR_TYPE.TOP).obj;
+            WearObj TopWearObj = female.wears.GetWearObj(Character.WEAR_TYPE.TOP);
+            if (TopWearObj == null) return;
+
+            GameObject TopRoot = TopWearObj.obj;
             SkinnedMeshRenderer TopBody_A = FindTopBodyMeshObject(TopRoot, "N_top_a");
             SkinnedMeshRenderer TopBody_B = FindTopBodyMeshObject(TopRoot, "N_top_b");
 
@@ -206,6 +211,9 @@ namespace UncensorBody
             GameObject TopMesh = Transform_Utility.FindTransform(TopRoot.transform, name).gameObject;
             if (TopMesh != null)
             {
+                Transform HS1_unc = Transform_Utility.FindTransform_Partial(TopMesh.transform, "cf_O_unc_");
+                if (HS1_unc != null && !PauseCaching) Destroy(HS1_unc.gameObject);
+
                 return Transform_Utility.FindTransform_Partial(TopMesh.transform, "body").GetComponentInChildren<SkinnedMeshRenderer>();
             }
             return null;
