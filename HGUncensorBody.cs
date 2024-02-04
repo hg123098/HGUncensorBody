@@ -16,7 +16,7 @@ namespace UncensorBody
     {
         public const string PLUGIN_NAME = "HG Uncensor Body";
         public const string PLUGIN_GUID = "HG.UncensorBody";
-        public const string PLUGIN_Version = "1.0.2";
+        public const string PLUGIN_Version = "1.0.3";
 
         internal static string abDataPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/BepInEx/plugins/HG";
         internal static string abName = "HGUncensorBody";
@@ -143,6 +143,8 @@ namespace UncensorBody
             [HarmonyPostfix, HarmonyPatch(typeof(Wears), nameof(Wears.WearInstantiate))]
             private static void SetFemaleUncensorBodyofTop(WEAR_TYPE type, Human ___human)
             {
+                if (___human == null) return;                //의상카드 생성 시에는 ___human이 NULL
+
                 if (type == WEAR_TYPE.TOP)
                 {
                     UBFemale UBfemale = FindUBFemale(___human.transform);

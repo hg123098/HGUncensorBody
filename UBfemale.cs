@@ -122,7 +122,7 @@ namespace UncensorBody
                 {
                     if( transform.name == newCollider.name.Substring(5))
                     {
-                        newCollider.transform.SetParent(transform, false);  
+                        newCollider.transform.SetParent(transform, false);
                         break;
                     }
                 }
@@ -208,13 +208,13 @@ namespace UncensorBody
 
         private SkinnedMeshRenderer FindTopBodyMeshObject(GameObject TopRoot, string name)
         {
-            GameObject TopMesh = Transform_Utility.FindTransform(TopRoot.transform, name).gameObject;
+            Transform TopMesh = Transform_Utility.FindTransform(TopRoot.transform, name);
             if (TopMesh != null)
             {
-                Transform HS1_unc = Transform_Utility.FindTransform_Partial(TopMesh.transform, "cf_O_unc_");
+                Transform HS1_unc = Transform_Utility.FindTransform_Partial(TopMesh, "cf_O_unc_");
                 if (HS1_unc != null && !PauseCaching) Destroy(HS1_unc.gameObject);
 
-                return Transform_Utility.FindTransform_Partial(TopMesh.transform, "body").GetComponentInChildren<SkinnedMeshRenderer>();
+                return Transform_Utility.FindTransform_Partial(TopMesh, "body").GetComponentInChildren<SkinnedMeshRenderer>();
             }
             return null;
         }
