@@ -174,7 +174,9 @@ namespace UncensorBody
                 if (target.name.Contains("k_f_kokan_00"))
                 {
                     UBFemale UBfemale = FindUBFemale(target);
+                    if (UBfemale == null) return;
                     UBMale UBmale = FindUBMale(___tinRoot);
+                    if (UBmale == null) return;
 
                     UBfemale.OpenVagina(part, __instance);
                     UBmale.adjustedFemale = UBfemale;
@@ -190,7 +192,9 @@ namespace UncensorBody
                 else if (target.name.Contains("k_f_ana_00"))
                 {
                     UBFemale UBfemale = FindUBFemale(target);
+                    if (UBfemale == null) return;
                     UBMale UBmale = FindUBMale(___tinRoot);
+                    if (UBmale == null) return;
 
                     UBmale.adjustedFemale = UBfemale;
 
@@ -204,7 +208,9 @@ namespace UncensorBody
                 else if (target.name.Contains("k_f_head_03"))
                 {
                     UBFemale UBfemale = FindUBFemale(target);
+                    if (UBfemale == null) return;
                     UBMale UBmale = FindUBMale(___tinRoot);
+                    if (UBmale == null) return;
 
                     UBmale.adjustedFemale = UBfemale;
 
@@ -218,8 +224,8 @@ namespace UncensorBody
             [HarmonyPrefix, HarmonyPatch(typeof(H_Members), nameof(H_Members.LateUpdate))]
             private static void PreFBIKUpdate()
             {
-                foreach (UBMale UBmale in UBmales) if ((UBmale.insertingVagina && UncensorBody._sMovePenisPosition.Value) || UBmale.pettingVagina || UBmale.pettingAna) UBmale.PostAdjust();
-                foreach (UBFemale UBfemale in UBfemales) if (UBfemale.VaginaItem || UBfemale.AnalItem) UBfemale.PostAdjust();
+                foreach (UBMale UBmale in UBmales) if (UBmale != null && ((UBmale.insertingVagina && UncensorBody._sMovePenisPosition.Value) || UBmale.pettingVagina || UBmale.pettingAna)) UBmale.PostAdjust();
+                foreach (UBFemale UBfemale in UBfemales) if (UBfemale != null && (UBfemale.VaginaItem || UBfemale.AnalItem)) UBfemale.PostAdjust();
             }
 
 
@@ -230,18 +236,21 @@ namespace UncensorBody
                 if (target.name.Contains("k_f_kokan_00"))
                 {
                     UBFemale UBfemale = FindUBFemale(target);
-
-                    UBfemale.InsertItem_V = __instance;
-                    UBfemale.VaginaItem = true;
-                    UBfemale.VaginaOpen = true;
-                }
+                    if (UBfemale != null)
+                    {
+                        UBfemale.InsertItem_V = __instance;
+                        UBfemale.VaginaItem = true;
+                        UBfemale.VaginaOpen = true;
+                    }                }
 
                 else if (target.name.Contains("k_f_ana_00"))
                 {
                     UBFemale UBfemale = FindUBFemale(target);
-
-                    UBfemale.InsertItem_A = __instance;
-                    UBfemale.AnalItem = true;
+                    if (UBfemale != null)
+                    {
+                        UBfemale.InsertItem_A = __instance;
+                        UBfemale.AnalItem = true;
+                    }
                 }
 
                 else if (target.name.Contains("k_f_head_03")) target = target.Find("Oral_IK");
@@ -254,11 +263,11 @@ namespace UncensorBody
                 CleanUBmales();
                 foreach (UBFemale UBfemale in UBfemales)
                 {
-                    UBfemale.IKResetUBfemale();
+                    if (UBfemale != null) UBfemale.IKResetUBfemale();
                 }
                 foreach (UBMale UBmale in UBmales)
                 {
-                    UBmale.ResetUBmale();
+                    if (UBmale != null) UBmale.ResetUBmale();
                 }
             }
         }
