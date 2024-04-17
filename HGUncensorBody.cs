@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using System;
+using BepInEx;
 using BepInEx.Configuration;
 using H;
 using Character;
@@ -16,7 +17,7 @@ namespace UncensorBody
     {
         public const string PLUGIN_NAME = "HG Uncensor Body";
         public const string PLUGIN_GUID = "HG.UncensorBody";
-        public const string PLUGIN_Version = "1.0.3";
+        public const string PLUGIN_Version = "1.0.4";
 
         internal static string abDataPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')) + "/BepInEx/plugins/HG";
         internal static string abName = "HGUncensorBody";
@@ -259,6 +260,44 @@ namespace UncensorBody
                 foreach (UBMale UBmale in UBmales)
                 {
                     UBmale.ResetUBmale();
+                }
+            }
+
+            [HarmonyPostfix, HarmonyPatch(typeof(CutScene), nameof(CutScene.CreateMale))]
+            private static void CutSceneFix_SetMaleID(string name, Male __result)
+            {
+                if (name == "モブＡ")
+                {
+                    __result.SetMaleID(MALE_ID.MOB_A);
+                }
+                else if (name == "モブＢ")
+                {
+                    __result.SetMaleID(MALE_ID.MOB_B);
+                }
+                else if (name == "モブＣ")
+                {
+                    __result.SetMaleID(MALE_ID.MOB_C);
+                }
+            }
+
+            [HarmonyPostfix, HarmonyPatch(typeof(CutAct_CharaShow), nameof(CutAct_CharaShow.Action))]
+            private static void CutSceneFix_FemaleShow(CutScene ___cutScene, string ___chara, string ___show)
+            {
+                Human human = ___cutScene.GetHuman(___chara);
+
+                if (___show.Length > 0)
+                {
+                    bool flag = true;
+                    if (___show.Equals("hide", StringComparison.OrdinalIgnoreCase) || ___show.Equals("false", StringComparison.OrdinalIgnoreCase) || ___show.Equals("off", StringComparison.OrdinalIgnoreCase))
+                    {
+                        flag = false;
+                    }
+                    if (human.sex == SEX.FEMALE)
+                    {
+                        Female female = human as Female;
+                        UBFemale UBfemale = female.GetComponent<UBFemale>();
+                        if (UBfemale != null) UBfemale.ShowFemale(flag);
+                    }
                 }
             }
         }

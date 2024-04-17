@@ -323,6 +323,11 @@ namespace UncensorBody
             if (AnalItem) k_f_ana_00.position += Adelta;
         }
 
+        public void ShowFemale(bool show)
+        {
+            uncensorbody.SetActive(show);
+        }
+
     }
 }
 
